@@ -14,6 +14,7 @@ import java.util.List;
 public class ProductoService implements ProductoServiceInterface{
 
     private ProductoDaoInterface productoDao = new ProductoDaoJdbc();
+    
     @Override
     public List<Producto> listarProductos() {
         return productoDao.findAll();

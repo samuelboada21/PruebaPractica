@@ -28,6 +28,7 @@ public class ProductoDaoJdbc implements ProductoDaoInterface {
     PreparedStatement ps = null;
     ResultSet rs = null;
 
+    //Metodos
     @Override
     public List<Producto> findAll() {
         List<Producto> productos = new ArrayList<Producto>();
@@ -111,11 +112,6 @@ public class ProductoDaoJdbc implements ProductoDaoInterface {
     @Override
     public void delete(int id) {
         try {
-
-//            Producto producto = findById(id);
-//            if (producto == null) {
-//                throw new RuntimeException("Error mi papá, no existe el producto");
-//            }
             con = Conexion.getConnection();
             ps = con.prepareStatement(DELETE_PRODUCTO);
             ps.setInt(1, id);
