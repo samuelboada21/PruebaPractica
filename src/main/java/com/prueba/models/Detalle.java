@@ -10,17 +10,15 @@ public class Detalle {
     private Integer cantidad;
     private Double valor;
     private Producto producto;
-    private Factura factura;
 
-    public Detalle() {
+    public Detalle(Integer id, Integer cantidad, Producto producto) {
+        this.id = id;
+        this.producto = producto;
+        this.cantidad = cantidad;
+        this.valor = cantidad * producto.getPrecio();
     }
 
-    public Detalle(Integer id, Integer cantidad, Double valor, Producto producto, Factura factura) {
-        this.id = id;
-        this.cantidad = cantidad;
-        this.valor = cantidad*producto.getValor();
-        this.producto = producto;
-        this.factura = factura;
+    public Detalle() {
     }
 
     public Integer getId() {
@@ -29,6 +27,14 @@ public class Detalle {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public Producto getProducto() {
+        return producto;
+    }
+
+    public void setProducto(Producto producto) {
+        this.producto = producto;
     }
 
     public Integer getCantidad() {
@@ -47,24 +53,8 @@ public class Detalle {
         this.valor = valor;
     }
 
-    public Producto getProducto() {
-        return producto;
-    }
-
-    public void setProducto(Producto producto) {
-        this.producto = producto;
-    }
-
-    public Factura getFactura() {
-        return factura;
-    }
-
-    public void setFactura(Factura factura) {
-        this.factura = factura;
-    }
-
     @Override
     public String toString() {
-        return "Detalle{" + "id=" + id + ", cantidad=" + cantidad + ", valor=" + valor + ", producto=" + producto + ", factura=" + factura + '}';
+        return "Detalle{" + "id=" + id + ", producto=" + producto + ", cantidad=" + cantidad + ", valor=" + valor + '}';
     }
 }

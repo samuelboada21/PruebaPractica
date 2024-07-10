@@ -10,9 +10,10 @@ import java.util.List;
  */
 public interface DetalleServiceInterface {
     
-    public List<Detalle> listarDetallesFactura();
+    public List<Detalle> listarDetallesFactura(int idFact);
     public Detalle buscarDetalle(Integer id);
-    public void añadirDetalle(Detalle Detalle);
-    public void actualizarDetalle(int id, Detalle detalle);
+    public void añadirDetalle(Detalle detalle, int idFact);
+    public void añadirDetalles(List<Detalle> detalles, int idFact);
+    public void actualizarDetalle(int id, Detalle detalle, int idFact);
     public void eliminarDetalle(int id);
 }

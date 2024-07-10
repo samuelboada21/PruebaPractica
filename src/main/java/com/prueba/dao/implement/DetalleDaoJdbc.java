@@ -36,23 +36,21 @@ public class DetalleDaoJdbc implements DetalleDaoInterface {
 
     //Metodos
     @Override
-    public List<Detalle> findAllbyFacturaId() {
+    public List<Detalle> findAllbyFacturaId(int idFact) {
         List<Detalle> detalles = new ArrayList<Detalle>();
         Producto producto = null;
         Factura factura = null;
         try {
             con = Conexion.getConnection();
             ps = con.prepareStatement(SELECT_DETALLES_FACTURA);
+            ps.setInt(1, idFact);
             rs = ps.executeQuery();
             while (rs.next()) {
                 int id = rs.getInt("id");
                 int cantidad = rs.getInt("cantidad");
-                double valor = rs.getDouble("valor");
-                int factura_id = rs.getInt("factura_id");
                 int producto_id = rs.getInt("producto_id");
                 producto = productoDao.findById(id);
-                factura = facturaDao.findById(id);
-                detalles.add(new Detalle(id, cantidad, valor, producto, factura));
+                detalles.add(new Detalle(id, cantidad, producto));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -76,12 +74,9 @@ public class DetalleDaoJdbc implements DetalleDaoInterface {
             rs = ps.executeQuery();
             if (rs.next()) {
                 int cantidad = rs.getInt("cantidad");
-                double valor = rs.getDouble("valor");
-                int factura_id = rs.getInt("factura_id");
                 int producto_id = rs.getInt("producto_id");
                 producto = productoDao.findById(id);
-                factura = facturaDao.findById(id);
-                detalle = new Detalle(id, cantidad, valor, producto, factura);
+                detalle = new Detalle(id, cantidad, producto);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -94,14 +89,14 @@ public class DetalleDaoJdbc implements DetalleDaoInterface {
     }
 
     @Override
-    public void save(Detalle detalle) {
+    public void save(Detalle detalle, int idFact) {
         try {
             con = Conexion.getConnection();
             ps = con.prepareStatement(INSERT_DETALLE);
             ps.setInt(1, detalle.getCantidad());
             ps.setDouble(2, detalle.getValor());
             ps.setInt(3, detalle.getProducto().getId());
-            ps.setInt(4, detalle.getFactura().getId());
+            ps.setInt(4, idFact);
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -112,14 +107,14 @@ public class DetalleDaoJdbc implements DetalleDaoInterface {
     }
 
     @Override
-    public void update(int id, Detalle detalle) {
+    public void update(int id, Detalle detalle, int idFact) {
         try {
             con = Conexion.getConnection();
             ps = con.prepareStatement(UPDATE_DETALLE);
             ps.setInt(1, detalle.getCantidad());
             ps.setDouble(2, detalle.getValor());
             ps.setInt(3, detalle.getProducto().getId());
-            ps.setInt(4, detalle.getFactura().getId());
+            ps.setInt(4, idFact);
             ps.setInt(5, id);
             ps.executeUpdate();
         } catch (SQLException e) {
@@ -143,6 +138,37 @@ public class DetalleDaoJdbc implements DetalleDaoInterface {
             if (ps != null) {
                 Conexion.close(ps);
             }
+            Conexion.close(con);
+        }
+    }
+
+    @Override
+    public void saveAll(List<Detalle> detalles, int idFact) {
+        Connection con = null;
+        PreparedStatement ps = null;
+        try {
+            con = Conexion.getConnection();
+            con.setAutoCommit(false); // Iniciar transacción
+            for (Detalle detalle : detalles) {
+                ps = con.prepareStatement(INSERT_DETALLE);
+                ps.setInt(1, detalle.getCantidad());
+                ps.setDouble(2, detalle.getValor());
+                ps.setInt(3, idFact);
+                ps.setInt(4, detalle.getProducto().getId());
+                ps.executeUpdate();
+                Conexion.close(ps);
+            }
+            con.commit(); // Hacer commit de la transacción
+        } catch (SQLException e) {
+            e.printStackTrace();
+            try {
+                if (con != null) {
+                    con.rollback(); // Hacer rollback en caso de error
+                }
+            } catch (SQLException rollbackEx) {
+                rollbackEx.printStackTrace();
+            }
+        } finally {
             Conexion.close(con);
         }
     }

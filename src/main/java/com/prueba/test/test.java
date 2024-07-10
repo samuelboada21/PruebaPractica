@@ -32,7 +32,7 @@ public class test {
         List<Producto> productos = productoDao.findAll();
         System.out.println("Lista de productos:");
         for (Producto producto : productos) {
-            System.out.println("ID: " + producto.getId() + ", Nombre: " + producto.getNombre() + ", Valor: " + producto.getValor());
+            System.out.println("ID: " + producto.getId() + ", Nombre: " + producto.getNombre() + ", precio: " + producto.getPrecio());
         }
     }
 
@@ -53,7 +53,7 @@ public class test {
         Producto productoAActualizar = productoDao.findById(id);
         if (productoAActualizar != null) {
             productoAActualizar.setNombre("Producto Actualizado S");
-            productoAActualizar.setValor(1000.0);
+            productoAActualizar.setPrecio(1000.0);
             productoDao.update(id, productoAActualizar);
             System.out.println("Producto actualizado: " + productoAActualizar.getNombre());
         } else {

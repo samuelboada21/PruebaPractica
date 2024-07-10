@@ -81,7 +81,7 @@ public class ProductoDaoJdbc implements ProductoDaoInterface {
             con = Conexion.getConnection();
             ps = con.prepareStatement(INSERT_PRODUCTO);
             ps.setString(1, producto.getNombre());
-            ps.setDouble(2, producto.getValor());
+            ps.setDouble(2, producto.getPrecio());
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -97,7 +97,7 @@ public class ProductoDaoJdbc implements ProductoDaoInterface {
             con = Conexion.getConnection();
             ps = con.prepareStatement(UPDATE_PRODUCTO);
             ps.setString(1, producto.getNombre());
-            ps.setDouble(2, producto.getValor());
+            ps.setDouble(2, producto.getPrecio());
             ps.setInt(3, id);
 
             ps.executeUpdate();

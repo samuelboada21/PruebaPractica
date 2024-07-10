@@ -1,12 +1,17 @@
-
 package com.prueba.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.prueba.models.Detalle;
 import com.prueba.models.Factura;
+import com.prueba.services.implement.DetalleService;
 import com.prueba.services.implement.FacturaService;
+import com.prueba.services.implement.ProductoService;
+import com.prueba.services.interfaces.DetalleServiceInterface;
 import com.prueba.services.interfaces.FacturaServiceInterface;
+import com.prueba.services.interfaces.ProductoServiceInterface;
 import com.prueba.util.MessagesResponse;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -18,10 +23,13 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author Samuel
  */
-@WebServlet("/api/facturas/*")
-public class FacturaServlet extends HttpServlet{
+@WebServlet(name = "FacturaServlet", urlPatterns = {"/api/facturas/*"})
+public class FacturaServlet extends HttpServlet {
+
     private static final long serialVersionUID = 1L;
     private final FacturaServiceInterface facturaService = new FacturaService();
+    private final DetalleServiceInterface detalleService = new DetalleService();
+    private final ProductoServiceInterface productoService = new ProductoService();
     private final ObjectMapper mapper = new ObjectMapper();
 
     @Override
@@ -104,9 +112,11 @@ public class FacturaServlet extends HttpServlet{
     private void crearFactura(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         Factura nuevaFactura = mapper.readValue(request.getInputStream(), Factura.class);
+        Detalle[] detallesArray = mapper.readValue(request.getInputStream(), Detalle[].class);
+        List<Detalle> nuevosDetalles = Arrays.asList(detallesArray);
 
-        facturaService.añadirFactura(nuevaFactura);
-        enviarResponse(response, HttpServletResponse.SC_CREATED, "Se creó exitosamente la factura");
+        facturaService.añadirFactura(nuevaFactura, nuevosDetalles);
+        enviarResponse(response, HttpServletResponse.SC_CREATED, "Se creó exitosamente la factura y sus detalles");
     }
 
     private void actualizarFactura(HttpServletRequest request, HttpServletResponse response)
@@ -132,11 +142,11 @@ public class FacturaServlet extends HttpServlet{
         if (encontrarFactura != null) {
             facturaService.eliminarFactura(id);
             enviarResponse(response, HttpServletResponse.SC_OK, "Factura eliminada correctamente");
-        }else{
+        } else {
             enviarResponse(response, HttpServletResponse.SC_NOT_FOUND, "Factura no encontrada");
         }
     }
-    
+
     private void enviarResponse(HttpServletResponse response, int statusCode, String mensaje)
             throws IOException {
         //Se construye el objeto

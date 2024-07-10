@@ -1,4 +1,3 @@
-
 package com.prueba.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,7 +18,8 @@ import javax.servlet.http.HttpServletResponse;
  * @author Samuel
  */
 @WebServlet("/api/detalle")
-public class DetalleServlet extends HttpServlet{
+public class DetalleServlet extends HttpServlet {
+
     private static final long serialVersionUID = 1L;
     private final DetalleServiceInterface detalleService = new DetalleService();
     private final ObjectMapper mapper = new ObjectMapper();
@@ -76,7 +76,7 @@ public class DetalleServlet extends HttpServlet{
 
     private void listarDetalles(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        List<Detalle> detalles = detalleService.listarDetallesFactura();
+        List<Detalle> detalles = detalleService.listarDetallesFactura(0);
         String jsonFacturas = mapper.writeValueAsString(detalles);
 
         response.setContentType("application/json");
@@ -104,8 +104,8 @@ public class DetalleServlet extends HttpServlet{
     private void crearDetalle(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         Detalle nuevoDetalle = mapper.readValue(request.getInputStream(), Detalle.class);
-
-        detalleService.añadirDetalle(nuevoDetalle);
+        int idFact = Integer.parseInt(request.getParameter("idFactura"));
+        detalleService.añadirDetalle(nuevoDetalle, idFact);
         enviarResponse(response, HttpServletResponse.SC_CREATED, "Se creó exitosamente la especificación");
     }
 
@@ -117,7 +117,8 @@ public class DetalleServlet extends HttpServlet{
         if (encontrarDetalle != null) {
             Detalle detalleActualizado = mapper.readValue(request.getReader(), Detalle.class);
             detalleActualizado.setId(id);
-            detalleService.actualizarDetalle(id, detalleActualizado);
+            int idFact = Integer.parseInt(request.getParameter("idFactura"));
+            detalleService.actualizarDetalle(id, detalleActualizado, idFact);
             enviarResponse(response, HttpServletResponse.SC_OK, "Se actualizó correctamente la especificación");
         } else {
             enviarResponse(response, HttpServletResponse.SC_NOT_FOUND, "Detalle no encontrado");
@@ -132,11 +133,11 @@ public class DetalleServlet extends HttpServlet{
         if (encontrarDetalle != null) {
             detalleService.eliminarDetalle(id);
             enviarResponse(response, HttpServletResponse.SC_OK, "Especificación eliminada correctamente");
-        }else{
+        } else {
             enviarResponse(response, HttpServletResponse.SC_NOT_FOUND, "No se encuentra la especificación");
         }
     }
-    
+
     private void enviarResponse(HttpServletResponse response, int statusCode, String mensaje)
             throws IOException {
         //Se construye el objeto

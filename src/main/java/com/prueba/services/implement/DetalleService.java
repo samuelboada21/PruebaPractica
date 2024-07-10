@@ -16,8 +16,8 @@ public class DetalleService implements DetalleServiceInterface{
     private DetalleDaoInterface detalleDao = new DetalleDaoJdbc();
 
     @Override
-    public List<Detalle> listarDetallesFactura() {
-        return detalleDao.findAllbyFacturaId();
+    public List<Detalle> listarDetallesFactura(int idFact) {
+        return detalleDao.findAllbyFacturaId(idFact);
     }
 
     @Override
@@ -26,13 +26,18 @@ public class DetalleService implements DetalleServiceInterface{
     }
 
     @Override
-    public void añadirDetalle(Detalle detalle) {
-        detalleDao.save(detalle);
+    public void añadirDetalle(Detalle detalle, int idFact) {
+        detalleDao.save(detalle, idFact);
+    }
+    
+    @Override
+    public void añadirDetalles(List<Detalle> detalles, int idFact) {
+        detalleDao.saveAll(detalles, idFact);
     }
 
     @Override
-    public void actualizarDetalle(int id, Detalle detalle) {
-        detalleDao.update(id, detalle);
+    public void actualizarDetalle(int id, Detalle detalle, int idFact) {
+        detalleDao.update(id, detalle, idFact);
     }
 
     @Override

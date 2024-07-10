@@ -1,4 +1,3 @@
-
 package com.prueba.models;
 
 /**
@@ -6,20 +5,20 @@ package com.prueba.models;
  * @author Samuel
  */
 public class Producto {
-    
+
     private Integer id;
     private String nombre;
-    private Double valor;
+    private Double precio;
+
+    public Producto(Integer id, String nombre, Double precio) {
+        this.id = id;
+        this.nombre = nombre;
+        this.precio = precio;
+    }
 
     public Producto() {
     }
     
-    public Producto(Integer id, String nombre, Double valor) {
-        this.id = id;
-        this.nombre = nombre;
-        this.valor = valor;
-    }
-
     public Integer getId() {
         return id;
     }
@@ -36,16 +35,16 @@ public class Producto {
         this.nombre = nombre;
     }
 
-    public Double getValor() {
-        return valor;
+    public Double getPrecio() {
+        return precio;
     }
 
-    public void setValor(Double valor) {
-        this.valor = valor;
+    public void setPrecio(Double precio) {
+        this.precio = precio;
     }
 
     @Override
     public String toString() {
-        return "Producto{" + "id=" + id + ", nombre=" + nombre + ", valor=" + valor + '}';
+        return "Producto{" + "id=" + id + ", nombre=" + nombre + ", precio=" + precio + '}';
     }
 }
