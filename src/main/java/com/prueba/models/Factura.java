@@ -1,8 +1,6 @@
 package com.prueba.models;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 /**
  *
@@ -16,16 +14,14 @@ public class Factura {
     private Double subtotal;
     private Double iva;
     private Double total;
-    private List<Detalle> detalles = new ArrayList<>();
 
-    public Factura(Integer id, String nombreCliente, Date fecha, Double subtotal, Double iva, Double total, List<Detalle> detalles) {
+    public Factura(Integer id, String nombreCliente, Date fecha, Double subtotal, Double iva, Double total) {
         this.id = id;
         this.nombreCliente = nombreCliente;
         this.fecha = fecha;
         this.subtotal = subtotal;
         this.iva = iva;
         this.total = total;
-        this.detalles = detalles;
     }
 
     public Factura() {
@@ -79,16 +75,8 @@ public class Factura {
         this.iva = iva;
     }
 
-    public List<Detalle> getDetalles() {
-        return detalles;
-    }
-
-    public void setDetalles(List<Detalle> detalles) {
-        this.detalles = detalles;
-    }
-
     @Override
     public String toString() {
-        return "Factura{" + "id=" + id + ", nombreCliente=" + nombreCliente + ", fecha=" + fecha + ", subtotal=" + subtotal + ", iva=" + iva + ", total=" + total + ", detalles=" + detalles + '}';
+        return "Factura{" + "id=" + id + ", nombreCliente=" + nombreCliente + ", fecha=" + fecha + ", subtotal=" + subtotal + ", iva=" + iva + ", total=" + total + '}';
     }
 }

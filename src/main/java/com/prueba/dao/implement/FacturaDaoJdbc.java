@@ -1,9 +1,8 @@
 package com.prueba.dao.implement;
 
-import com.prueba.dao.interfaces.DetalleDaoInterface;
 import com.prueba.dao.interfaces.FacturaDaoInterface;
+import com.prueba.dao.interfaces.ProductoDaoInterface;
 import com.prueba.dbconnection.Conexion;
-import com.prueba.models.Detalle;
 import com.prueba.models.Factura;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,7 +11,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.sql.Statement;
 
 /**
  *
@@ -20,14 +18,14 @@ import java.sql.Statement;
  */
 public class FacturaDaoJdbc implements FacturaDaoInterface {
 
-    //Consultas SQL JDBC
+    //Consultas SQL JDBC Facturas
     private static final String SELECT_FACTURAS = "SELECT * FROM facturas";
     private static final String SELECT_FACTURA_ID = "SELECT * FROM facturas WHERE id = ?";
     private static final String INSERT_FACTURA = "INSERT INTO facturas(nombre_cliente, fecha, subtotal, iva, total) VALUES (?,?,?,?,?)";
     private static final String UPDATE_FACTURA = "UPDATE facturas SET nombre_cliente = ?, fecha = ?, subtotal = ?, iva = ?, total = ? WHERE id = ?";
     private static final String DELETE_FACTURA = "DELETE FROM facturas WHERE id = ?";
 
-    private DetalleDaoInterface detallesDao = new DetalleDaoJdbc();
+    private ProductoDaoInterface productoDao = new ProductoDaoJdbc();
 
     //Variables
     Connection con = null;
@@ -49,9 +47,7 @@ public class FacturaDaoJdbc implements FacturaDaoInterface {
                 double subtotal = rs.getDouble("subtotal");
                 double iva = rs.getDouble("iva");
                 double total = rs.getDouble("total");
-                List<Detalle> detalles = new ArrayList<>();
-                detalles = detallesDao.findAllbyFacturaId(id);
-                facturas.add(new Factura(id, nombre_cliente, fecha, subtotal, iva, total, detalles));
+                facturas.add(new Factura(id, nombre_cliente, fecha, subtotal, iva, total));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -77,9 +73,7 @@ public class FacturaDaoJdbc implements FacturaDaoInterface {
                 double subtotal = rs.getDouble("subtotal");
                 double iva = rs.getDouble("iva");
                 double total = rs.getDouble("total");
-                List<Detalle> detalles = new ArrayList<>();
-                detalles = detallesDao.findAllbyFacturaId(id);
-                factura = new Factura(id, nombre_cliente, fecha, subtotal, iva, total, detalles);
+                factura = new Factura(id, nombre_cliente, fecha, subtotal, iva, total);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -94,11 +88,9 @@ public class FacturaDaoJdbc implements FacturaDaoInterface {
     @Override
     public int save(Factura factura) {
         java.sql.Date dateSQL = new java.sql.Date(factura.getFecha().getTime());
-        int generatedId = -1;
         try {
             con = Conexion.getConnection();
-            con.setAutoCommit(false); // Iniciar transacción
-            ps = con.prepareStatement(INSERT_FACTURA, Statement.RETURN_GENERATED_KEYS);
+            ps = con.prepareStatement(INSERT_FACTURA);
             ps.setString(1, factura.getNombreCliente());
             ps.setDate(2, dateSQL);
             ps.setDouble(3, factura.getSubtotal());
@@ -106,26 +98,14 @@ public class FacturaDaoJdbc implements FacturaDaoInterface {
             ps.setDouble(5, factura.getTotal());
             ps.executeUpdate();
 
-            rs = ps.getGeneratedKeys();
-            if (rs.next()) {
-                generatedId = rs.getInt(1);
-            }
-            con.commit(); // Hacer commit de la transacción
         } catch (SQLException e) {
             e.printStackTrace();
-            try {
-                if (con != null) {
-                    con.rollback(); // Hacer rollback en caso de error
-                }
-            } catch (SQLException rollbackEx) {
-                rollbackEx.printStackTrace();
-            }
         } finally {
             Conexion.close(con);
             Conexion.close(ps);
             Conexion.close(rs);
         }
-        return generatedId;
+        return 0;
     }
 
     @Override
@@ -134,7 +114,7 @@ public class FacturaDaoJdbc implements FacturaDaoInterface {
             con = Conexion.getConnection();
             ps = con.prepareStatement(UPDATE_FACTURA);
             ps.setString(1, factura.getNombreCliente());
-            ps.setDate(2, (java.sql.Date) factura.getFecha());
+            ps.setDate(2, new java.sql.Date(factura.getFecha().getTime())); // Aquí también se convierte de java.util.Date a java.sql.Date
             ps.setDouble(3, factura.getSubtotal());
             ps.setDouble(4, factura.getIva());
             ps.setDouble(5, factura.getTotal());
@@ -164,4 +144,5 @@ public class FacturaDaoJdbc implements FacturaDaoInterface {
             Conexion.close(con);
         }
     }
+
 }

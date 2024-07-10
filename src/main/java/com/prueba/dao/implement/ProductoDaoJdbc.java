@@ -19,8 +19,8 @@ public class ProductoDaoJdbc implements ProductoDaoInterface {
     //Consultas SQL JDBC
     private static final String SELECT_PRODUCTOS = "SELECT * FROM productos";
     private static final String SELECT_PRODUCTO_ID = "SELECT * FROM productos WHERE id = ?";
-    private static final String INSERT_PRODUCTO = "INSERT INTO productos(nombre, valor) VALUES (?,?)";
-    private static final String UPDATE_PRODUCTO = "UPDATE productos SET nombre = ?, valor = ? WHERE id = ?";
+    private static final String INSERT_PRODUCTO = "INSERT INTO productos(nombre, precio) VALUES (?,?)";
+    private static final String UPDATE_PRODUCTO = "UPDATE productos SET nombre = ?, precio = ? WHERE id = ?";
     private static final String DELETE_PRODUCTO = "DELETE FROM productos WHERE id = ?";
 
     //Variables
@@ -39,8 +39,8 @@ public class ProductoDaoJdbc implements ProductoDaoInterface {
             while (rs.next()) {
                 int id = rs.getInt("id");
                 String nombre = rs.getString("nombre");
-                double valor = rs.getDouble("valor");
-                productos.add(new Producto(id, nombre, valor));
+                double precio = rs.getDouble("precio");
+                productos.add(new Producto(id, nombre, precio));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -62,8 +62,8 @@ public class ProductoDaoJdbc implements ProductoDaoInterface {
             rs = ps.executeQuery();
             if (rs.next()) {
                 String nombre = rs.getString("nombre");
-                double valor = rs.getDouble("valor");
-                producto = new Producto(id, nombre, valor);
+                double precio = rs.getDouble("precio");
+                producto = new Producto(id, nombre, precio);
             }
         } catch (SQLException e) {
             e.printStackTrace();

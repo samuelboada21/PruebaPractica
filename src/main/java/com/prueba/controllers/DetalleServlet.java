@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author Samuel
  */
-@WebServlet("/api/detalle")
+@WebServlet("/api/details/*")
 public class DetalleServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
@@ -33,6 +33,8 @@ public class DetalleServlet extends HttpServlet {
             listarDetalles(request, response);
         } else if (action.matches("/\\d+")) {
             mostrarDetallePorId(request, response);
+        } else if (action.matches("/facturas/\\d+")){
+            listarDetallesFactura(request, response);
         } else {
             enviarResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Ruta inválida");
         }
@@ -76,13 +78,26 @@ public class DetalleServlet extends HttpServlet {
 
     private void listarDetalles(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        List<Detalle> detalles = detalleService.listarDetallesFactura(0);
+        List<Detalle> detalles = detalleService.listarDetalles();
         String jsonFacturas = mapper.writeValueAsString(detalles);
 
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write(jsonFacturas);
     }
+    
+    private void listarDetallesFactura(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+    String action = request.getPathInfo();
+    int idFactura = Integer.parseInt(action.substring(action.lastIndexOf('/') + 1)); // Obtiene el id de la factura del path
+
+    List<Detalle> detalles = detalleService.listarDetallesFactura(idFactura);
+    String jsonDetalles = mapper.writeValueAsString(detalles);
+
+    response.setContentType("application/json");
+    response.setCharacterEncoding("UTF-8");
+    response.getWriter().write(jsonDetalles);
+}
 
     private void mostrarDetallePorId(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

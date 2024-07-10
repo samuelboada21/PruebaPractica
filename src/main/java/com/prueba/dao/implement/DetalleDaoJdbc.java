@@ -1,11 +1,9 @@
 package com.prueba.dao.implement;
 
 import com.prueba.dao.interfaces.DetalleDaoInterface;
-import com.prueba.dao.interfaces.FacturaDaoInterface;
 import com.prueba.dao.interfaces.ProductoDaoInterface;
 import com.prueba.dbconnection.Conexion;
 import com.prueba.models.Detalle;
-import com.prueba.models.Factura;
 import com.prueba.models.Producto;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -21,6 +19,7 @@ import java.util.List;
 public class DetalleDaoJdbc implements DetalleDaoInterface {
 
     //Consultas SQL JDBC
+    private static final String SELECT_DETALLES = "SELECT * FROM detalles";
     private static final String SELECT_DETALLES_FACTURA = "SELECT * FROM detalles WHERE factura_id = ?";
     private static final String SELECT_DETALLE_ID = "SELECT * FROM detalles WHERE id = ?";
     private static final String INSERT_DETALLE = "INSERT INTO detalles(cantidad, valor, factura_id, producto_id) VALUES (?,?,?,?)";
@@ -28,7 +27,6 @@ public class DetalleDaoJdbc implements DetalleDaoInterface {
     private static final String DELETE_DETALLE = "DELETE FROM detalles WHERE id = ?";
 
     private ProductoDaoInterface productoDao = new ProductoDaoJdbc();
-    private FacturaDaoInterface facturaDao = new FacturaDaoJdbc();
     //Variables
     Connection con = null;
     PreparedStatement ps = null;
@@ -36,20 +34,18 @@ public class DetalleDaoJdbc implements DetalleDaoInterface {
 
     //Metodos
     @Override
-    public List<Detalle> findAllbyFacturaId(int idFact) {
+    public List<Detalle> findAll() {
         List<Detalle> detalles = new ArrayList<Detalle>();
         Producto producto = null;
-        Factura factura = null;
         try {
             con = Conexion.getConnection();
-            ps = con.prepareStatement(SELECT_DETALLES_FACTURA);
-            ps.setInt(1, idFact);
+            ps = con.prepareStatement(SELECT_DETALLES);
             rs = ps.executeQuery();
             while (rs.next()) {
                 int id = rs.getInt("id");
                 int cantidad = rs.getInt("cantidad");
                 int producto_id = rs.getInt("producto_id");
-                producto = productoDao.findById(id);
+                producto = productoDao.findById(producto_id);
                 detalles.add(new Detalle(id, cantidad, producto));
             }
         } catch (SQLException e) {
@@ -63,10 +59,36 @@ public class DetalleDaoJdbc implements DetalleDaoInterface {
     }
 
     @Override
-    public Detalle findById(int id) {
+    public List<Detalle> findDetallesByFactura(int idFactura) {
+        List<Detalle> detalles = new ArrayList<>();
+        Producto producto = null;
+        try {
+            con = Conexion.getConnection();
+            ps = con.prepareStatement(SELECT_DETALLES_FACTURA);
+            ps.setInt(1, idFactura);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                int cantidad = rs.getInt("cantidad");
+                int producto_id = rs.getInt("producto_id");
+                producto = productoDao.findById(producto_id);
+                Detalle detalle = new Detalle(id, cantidad, producto);
+                detalles.add(detalle);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            Conexion.close(rs);
+            Conexion.close(con);
+            Conexion.close(ps);
+        }
+        return detalles;
+    }
+
+    @Override
+    public Detalle findDetalleById(int id) {
         Detalle detalle = null;
         Producto producto = null;
-        Factura factura = null;
         try {
             con = Conexion.getConnection();
             ps = con.prepareStatement(SELECT_DETALLE_ID);
@@ -75,7 +97,7 @@ public class DetalleDaoJdbc implements DetalleDaoInterface {
             if (rs.next()) {
                 int cantidad = rs.getInt("cantidad");
                 int producto_id = rs.getInt("producto_id");
-                producto = productoDao.findById(id);
+                producto = productoDao.findById(producto_id);
                 detalle = new Detalle(id, cantidad, producto);
             }
         } catch (SQLException e) {
@@ -89,14 +111,14 @@ public class DetalleDaoJdbc implements DetalleDaoInterface {
     }
 
     @Override
-    public void save(Detalle detalle, int idFact) {
+    public void saveDetalle(Detalle detalle, int idFact) {
         try {
             con = Conexion.getConnection();
             ps = con.prepareStatement(INSERT_DETALLE);
             ps.setInt(1, detalle.getCantidad());
             ps.setDouble(2, detalle.getValor());
-            ps.setInt(3, detalle.getProducto().getId());
-            ps.setInt(4, idFact);
+            ps.setInt(3, idFact);
+            ps.setInt(4, detalle.getProducto().getId());
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -107,14 +129,14 @@ public class DetalleDaoJdbc implements DetalleDaoInterface {
     }
 
     @Override
-    public void update(int id, Detalle detalle, int idFact) {
+    public void updateDetalle(int id, Detalle detalle, int idFact) {
         try {
             con = Conexion.getConnection();
             ps = con.prepareStatement(UPDATE_DETALLE);
             ps.setInt(1, detalle.getCantidad());
             ps.setDouble(2, detalle.getValor());
-            ps.setInt(3, detalle.getProducto().getId());
-            ps.setInt(4, idFact);
+            ps.setInt(3, idFact);
+            ps.setInt(4, detalle.getProducto().getId());
             ps.setInt(5, id);
             ps.executeUpdate();
         } catch (SQLException e) {
@@ -126,7 +148,7 @@ public class DetalleDaoJdbc implements DetalleDaoInterface {
     }
 
     @Override
-    public void delete(int id) {
+    public void deleteDetalle(int id) {
         try {
             con = Conexion.getConnection();
             ps = con.prepareStatement(DELETE_DETALLE);
@@ -143,7 +165,7 @@ public class DetalleDaoJdbc implements DetalleDaoInterface {
     }
 
     @Override
-    public void saveAll(List<Detalle> detalles, int idFact) {
+    public void saveAllDetalle(List<Detalle> detalles, int idFact) {
         Connection con = null;
         PreparedStatement ps = null;
         try {

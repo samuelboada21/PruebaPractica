@@ -2,9 +2,7 @@ package com.prueba.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.prueba.models.Producto;
-import com.prueba.services.implement.FacturaService;
 import com.prueba.services.implement.ProductoService;
-import com.prueba.services.interfaces.FacturaServiceInterface;
 import com.prueba.services.interfaces.ProductoServiceInterface;
 import com.prueba.util.MessagesResponse;
 
@@ -17,13 +15,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@WebServlet(name="ProductoServlet", urlPatterns = {"/api/productos/*"})
+@WebServlet("/api/productos/*")
 public class ProductoServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
     private final ProductoServiceInterface productoService = new ProductoService();
     private final ObjectMapper mapper = new ObjectMapper();
-    private final FacturaServiceInterface facturaService = new FacturaService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)

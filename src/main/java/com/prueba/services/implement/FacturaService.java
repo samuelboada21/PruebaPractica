@@ -1,10 +1,7 @@
 package com.prueba.services.implement;
 
-import com.prueba.dao.implement.DetalleDaoJdbc;
 import com.prueba.dao.implement.FacturaDaoJdbc;
-import com.prueba.dao.interfaces.DetalleDaoInterface;
 import com.prueba.dao.interfaces.FacturaDaoInterface;
-import com.prueba.models.Detalle;
 import com.prueba.models.Factura;
 import com.prueba.services.interfaces.FacturaServiceInterface;
 import java.util.List;
@@ -16,7 +13,6 @@ import java.util.List;
 public class FacturaService implements FacturaServiceInterface {
 
     private FacturaDaoInterface facturaDao = new FacturaDaoJdbc();
-    private DetalleDaoInterface detalleDao = new DetalleDaoJdbc();
 
     @Override
     public List<Factura> listarFacturas() {
@@ -28,17 +24,9 @@ public class FacturaService implements FacturaServiceInterface {
         return facturaDao.findById(id);
     }
 
-//    @Override
-//    public void añadirFactura(Factura factura, List<Detalle> detalles) {
-//        facturaDao.save(factura, detalles);
-//    }
     @Override
-    public void añadirFactura(Factura factura, List<Detalle> detalles) {
-        int idFact = facturaDao.save(factura);
-//        for (Detalle detalle : detalles) {
-//            detalle.setFactura(factura);
-        detalleDao.saveAll(detalles, idFact);
-//        }
+    public void añadirFactura(Factura factura) {
+        facturaDao.save(factura);
     }
 
     @Override

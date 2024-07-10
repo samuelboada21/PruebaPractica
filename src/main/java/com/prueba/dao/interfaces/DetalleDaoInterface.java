@@ -10,10 +10,11 @@ import java.util.List;
  */
 public interface DetalleDaoInterface {
     
-    public List<Detalle> findAllbyFacturaId(int idFact);
-    public Detalle findById(int id);
-    public void save(Detalle detalle, int idFact);
-    public void saveAll(List<Detalle> detalles, int idFact);
-    public void update(int id, Detalle detalle, int idFact);
-    public void delete(int id);
+    public List<Detalle> findAll();
+    public List<Detalle> findDetallesByFactura(int idFact);
+    public Detalle findDetalleById(int id);
+    public void saveDetalle(Detalle detalle, int idFact);
+    public void saveAllDetalle(List<Detalle> detalles, int idFact);
+    public void updateDetalle(int id, Detalle detalle, int idFact);
+    public void deleteDetalle(int id);
 }
