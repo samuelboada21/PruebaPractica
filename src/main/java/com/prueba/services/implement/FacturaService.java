@@ -2,6 +2,7 @@ package com.prueba.services.implement;
 
 import com.prueba.dao.implement.FacturaDaoJdbc;
 import com.prueba.dao.interfaces.FacturaDaoInterface;
+import com.prueba.models.Detalle;
 import com.prueba.models.Factura;
 import com.prueba.services.interfaces.FacturaServiceInterface;
 import java.util.List;
@@ -25,8 +26,8 @@ public class FacturaService implements FacturaServiceInterface {
     }
 
     @Override
-    public void añadirFactura(Factura factura) {
-        facturaDao.save(factura);
+    public void añadirFactura(Factura factura, List<Detalle> detalles) {
+        facturaDao.save(factura, detalles);
     }
 
     @Override

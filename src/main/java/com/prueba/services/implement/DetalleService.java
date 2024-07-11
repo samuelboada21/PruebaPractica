@@ -4,6 +4,8 @@ import com.prueba.dao.implement.DetalleDaoJdbc;
 import com.prueba.dao.interfaces.DetalleDaoInterface;
 import com.prueba.models.Detalle;
 import com.prueba.services.interfaces.DetalleServiceInterface;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
 /**

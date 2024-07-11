@@ -122,10 +122,11 @@ public class DetalleDaoJdbc implements DetalleDaoInterface {
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            Conexion.close(con);
-            Conexion.close(ps);
-        }
+        } 
+//        finally {
+//            Conexion.close(con);
+//            Conexion.close(ps);
+//        }
     }
 
     @Override
@@ -170,7 +171,6 @@ public class DetalleDaoJdbc implements DetalleDaoInterface {
         PreparedStatement ps = null;
         try {
             con = Conexion.getConnection();
-            con.setAutoCommit(false); // Iniciar transacción
             for (Detalle detalle : detalles) {
                 ps = con.prepareStatement(INSERT_DETALLE);
                 ps.setInt(1, detalle.getCantidad());
@@ -180,12 +180,11 @@ public class DetalleDaoJdbc implements DetalleDaoInterface {
                 ps.executeUpdate();
                 Conexion.close(ps);
             }
-            con.commit(); // Hacer commit de la transacción
         } catch (SQLException e) {
             e.printStackTrace();
             try {
                 if (con != null) {
-                    con.rollback(); // Hacer rollback en caso de error
+                    con.rollback();
                 }
             } catch (SQLException rollbackEx) {
                 rollbackEx.printStackTrace();

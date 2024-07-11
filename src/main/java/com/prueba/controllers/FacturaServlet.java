@@ -1,6 +1,9 @@
 package com.prueba.controllers;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.prueba.models.Detalle;
 import com.prueba.models.Factura;
 import com.prueba.services.implement.FacturaService;
 import com.prueba.services.implement.ProductoService;
@@ -106,9 +109,17 @@ public class FacturaServlet extends HttpServlet {
 
     private void crearFactura(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        Factura nuevaFactura = mapper.readValue(request.getInputStream(), Factura.class);
+        // Leer la factura y detalles desde el cuerpo de la solicitud
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode rootNode = mapper.readTree(request.getInputStream());
+        // Obtener la factura principal desde el JSON
+        Factura nuevaFactura = mapper.convertValue(rootNode.get("factura"), Factura.class);
+        // Obtener la lista de detalles desde el JSON
+        List<Detalle> detalles = mapper.readerFor(new TypeReference<List<Detalle>>() {}).readValue(rootNode.get("detalles"));
+        // Llamar al servicio para añadir la factura con sus detalles
+        facturaService.añadirFactura(nuevaFactura, detalles);
 
-        facturaService.añadirFactura(nuevaFactura);
+        // Enviar respuesta al cliente
         enviarResponse(response, HttpServletResponse.SC_CREATED, "Se creó exitosamente la factura y sus detalles");
     }
 

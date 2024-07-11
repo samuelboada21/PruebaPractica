@@ -7,9 +7,9 @@ com\prueba\services\implement\ProductoService.class
 com\prueba\dao\implement\ProductoDaoJdbc.class
 com\prueba\dbconnection\Conexion.class
 com\prueba\services\implement\DetalleService.class
+com\prueba\controllers\FacturaServlet$1.class
 com\prueba\controllers\FacturaServlet.class
 com\prueba\controllers\ProductoServlet.class
-com\prueba\test\test.class
 com\prueba\services\interfaces\FacturaServiceInterface.class
 com\prueba\dao\interfaces\FacturaDaoInterface.class
 com\prueba\util\MessagesResponse.class

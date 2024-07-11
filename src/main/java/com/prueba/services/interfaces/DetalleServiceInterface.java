@@ -2,6 +2,8 @@
 package com.prueba.services.interfaces;
 
 import com.prueba.models.Detalle;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
 /**
