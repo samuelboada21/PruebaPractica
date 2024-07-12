@@ -26,7 +26,6 @@ public class ProductoServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String action = request.getPathInfo();
-
         if (action == null || action.equals("/")) {
             listarProductos(request, response);
         } else if (action.matches("/\\d+")) {
@@ -40,7 +39,6 @@ public class ProductoServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String action = request.getPathInfo();
-
         if (action != null && action.matches("/create")) {
             crearProducto(request, response);
         } else {
@@ -52,7 +50,6 @@ public class ProductoServlet extends HttpServlet {
     protected void doPut(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String action = request.getPathInfo();
-
         if (action != null && action.matches("/update/\\d+")) {
             actualizarProducto(request, response);
         } else {
@@ -64,7 +61,6 @@ public class ProductoServlet extends HttpServlet {
     protected void doDelete(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String action = request.getPathInfo();
-
         if (action != null && action.matches("/delete/\\d+")) {
             eliminarProducto(request, response);
         } else {
@@ -76,7 +72,6 @@ public class ProductoServlet extends HttpServlet {
             throws ServletException, IOException {
         List<Producto> productos = productoService.listarProductos();
         String jsonProductos = mapper.writeValueAsString(productos);
-
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write(jsonProductos);
@@ -86,11 +81,9 @@ public class ProductoServlet extends HttpServlet {
             throws ServletException, IOException {
         String action = request.getPathInfo();
         int id = Integer.parseInt(action.substring(1)); // elimina el "/"
-
         Producto producto = productoService.buscarProducto(id);
         if (producto != null) {
             String jsonProducto = mapper.writeValueAsString(producto);
-
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
             response.getWriter().write(jsonProducto);
@@ -102,7 +95,6 @@ public class ProductoServlet extends HttpServlet {
     private void crearProducto(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         Producto nuevoProducto = mapper.readValue(request.getInputStream(), Producto.class);
-
         productoService.añadirProducto(nuevoProducto);
         enviarResponse(response, HttpServletResponse.SC_CREATED, "Se creó exitosamente el producto");
     }
@@ -140,7 +132,6 @@ public class ProductoServlet extends HttpServlet {
         //Se construye el objeto
         MessagesResponse messageResponse = new MessagesResponse(statusCode, mensaje);
         String jsonResponse = mapper.writeValueAsString(messageResponse);
-
         response.setContentType("application/json"); //se transforma a json
         response.setCharacterEncoding("UTF-8");
         response.setStatus(statusCode); // estado

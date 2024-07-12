@@ -39,5 +39,4 @@ public class ProductoService implements ProductoServiceInterface{
     public void eliminarProducto(int id) {
         productoDao.delete(id);
     }
-    
 }

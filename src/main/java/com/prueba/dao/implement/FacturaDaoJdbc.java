@@ -21,15 +21,17 @@ import java.util.List;
  */
 public class FacturaDaoJdbc implements FacturaDaoInterface {
 
-    //Consultas SQL JDBC Facturas
+    //Consultas SQL JDBC
     private static final String SELECT_FACTURAS = "SELECT * FROM facturas";
     private static final String SELECT_FACTURA_ID = "SELECT * FROM facturas WHERE id = ?";
     private static final String INSERT_FACTURA = "INSERT INTO facturas(nombre_cliente, fecha, subtotal, iva, total) VALUES (?,?,?,?,?)";
     private static final String UPDATE_FACTURA = "UPDATE facturas SET nombre_cliente = ?, fecha = ?, subtotal = ?, iva = ?, total = ? WHERE id = ?";
     private static final String DELETE_FACTURA = "DELETE FROM facturas WHERE id = ?";
 
+    //Consulta SQL JDBC para Insertar Detalle
     private static final String INSERT_DETALLE = "INSERT INTO detalles(cantidad, valor, factura_id, producto_id) VALUES (?,?,?,?)";
-    
+    private static final String DELETE_DETALLE_FACTURA = "DELETE FROM detalles WHERE factura_id = ?";
+
     private ProductoDaoInterface productoDao = new ProductoDaoJdbc();
     private DetalleDaoInterface detalleDao = new DetalleDaoJdbc();
 
@@ -91,53 +93,6 @@ public class FacturaDaoJdbc implements FacturaDaoInterface {
         return factura;
     }
 
-//    @Override
-//    public void save(Factura factura, List<Detalle> detalles) {
-//        java.sql.Date dateSQL = new java.sql.Date(factura.getFecha().getTime());
-//        Connection con = null;
-//        PreparedStatement ps = null;
-//        ResultSet rs = null;
-//        try {
-//            con = Conexion.getConnection();
-//            con.setAutoCommit(false);
-//            ps = con.prepareStatement(INSERT_FACTURA, Statement.RETURN_GENERATED_KEYS);
-//            ps.setString(1, factura.getNombreCliente());
-//            ps.setDate(2, dateSQL);
-//            ps.setDouble(3, factura.getSubtotal());
-//            ps.setDouble(4, factura.getIva());
-//            ps.setDouble(5, factura.getTotal());
-//            ps.executeUpdate();
-//            rs = ps.getGeneratedKeys();
-//            int facturaId = 0;
-//            if (rs.next()) {
-//                facturaId = rs.getInt(1);
-//            }
-//            for (Detalle detalle : detalles) {
-//                detalleDao.saveDetalle(detalle, 24);
-//            }
-//            con.commit();
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//            try {
-//                if (con != null) {
-//                    con.rollback();
-//                }
-//            } catch (SQLException ex) {
-//                ex.printStackTrace();
-//            }
-//        } finally {
-//            try {
-//                if (con != null) {
-//                    con.setAutoCommit(true);
-//                }
-//            } catch (SQLException ex) {
-//                ex.printStackTrace();
-//            }
-//            Conexion.close(rs);
-//            Conexion.close(ps);
-//            Conexion.close(con);
-//        }
-//    }
     @Override
     public void save(Factura factura, List<Detalle> detalles) {
         java.sql.Date dateSQL = new java.sql.Date(factura.getFecha().getTime());
@@ -148,8 +103,7 @@ public class FacturaDaoJdbc implements FacturaDaoInterface {
         try {
             con = Conexion.getConnection();
             con.setAutoCommit(false);
-
-            // Guardar la factura
+            // Guarda la factura
             psFactura = con.prepareStatement(INSERT_FACTURA, Statement.RETURN_GENERATED_KEYS);
             psFactura.setString(1, factura.getNombreCliente());
             psFactura.setDate(2, dateSQL);
@@ -162,19 +116,17 @@ public class FacturaDaoJdbc implements FacturaDaoInterface {
             if (rs.next()) {
                 facturaId = rs.getInt(1);
             }
-
-            // Guardar los detalles de la factura
+            // Guarda los detalles de la factura
             psDetalle = con.prepareStatement(INSERT_DETALLE);
             for (Detalle detalle : detalles) {
                 psDetalle.setInt(1, detalle.getCantidad());
                 psDetalle.setDouble(2, detalle.getValor());
-                psDetalle.setInt(3, facturaId); // Usa el id de la factura recién creada
+                psDetalle.setInt(3, facturaId);
                 psDetalle.setInt(4, detalle.getProducto().getId());
                 psDetalle.addBatch();
             }
             psDetalle.executeBatch();
-
-            // Confirmar la transacción
+            // Confirmamos la transacción
             con.commit();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -206,7 +158,7 @@ public class FacturaDaoJdbc implements FacturaDaoInterface {
             con = Conexion.getConnection();
             ps = con.prepareStatement(UPDATE_FACTURA);
             ps.setString(1, factura.getNombreCliente());
-            ps.setDate(2, new java.sql.Date(factura.getFecha().getTime())); // Aquí también se convierte de java.util.Date a java.sql.Date
+            ps.setDate(2, new java.sql.Date(factura.getFecha().getTime()));
             ps.setDouble(3, factura.getSubtotal());
             ps.setDouble(4, factura.getIva());
             ps.setDouble(5, factura.getTotal());
@@ -222,19 +174,45 @@ public class FacturaDaoJdbc implements FacturaDaoInterface {
 
     @Override
     public void delete(int id) {
+        Connection con = null;
+        PreparedStatement psFactura = null;
+        PreparedStatement psDetalle = null;
         try {
             con = Conexion.getConnection();
-            ps = con.prepareStatement(DELETE_FACTURA);
-            ps.setInt(1, id);
-            ps.executeUpdate();
+            con.setAutoCommit(false);
+
+            // Eliminar los detalles asociados a la factura
+            psDetalle = con.prepareStatement(DELETE_DETALLE_FACTURA);
+            psDetalle.setInt(1, id);
+            psDetalle.executeUpdate();
+            Conexion.close(psDetalle);
+
+            // Eliminar la factura
+            psFactura = con.prepareStatement(DELETE_FACTURA);
+            psFactura.setInt(1, id);
+            psFactura.executeUpdate();
+
+            // Confirmamos la transacción
+            con.commit();
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            if (ps != null) {
-                Conexion.close(ps);
+            try {
+                if (con != null) {
+                    con.rollback();
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
             }
+        } finally {
+            try {
+                if (con != null) {
+                    con.setAutoCommit(true);
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+            Conexion.close(psFactura);
             Conexion.close(con);
         }
     }
-
 }

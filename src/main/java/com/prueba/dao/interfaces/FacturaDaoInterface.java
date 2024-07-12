@@ -9,7 +9,6 @@ import java.util.List;
  * @author Samuel
  */
 public interface FacturaDaoInterface {
-    
     public List<Factura> findAll();
     public Factura findById(int id);
     public void save(Factura factura, List<Detalle> detalles);

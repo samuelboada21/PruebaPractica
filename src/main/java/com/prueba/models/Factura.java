@@ -59,20 +59,16 @@ public class Factura {
         this.subtotal = subtotal;
     }
 
-    public Double getTotal() {
-        return total;
-    }
-
-    public void setTotal(Double total) {
-        this.total = total;
-    }
-
     public Double getIva() {
         return iva;
     }
 
     public void setIva(Double iva) {
         this.iva = iva;
+    }
+
+    public Double getTotal() {
+        return total;
     }
 
     @Override

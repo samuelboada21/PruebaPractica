@@ -23,6 +23,8 @@ public class ProductoDaoJdbc implements ProductoDaoInterface {
     private static final String UPDATE_PRODUCTO = "UPDATE productos SET nombre = ?, precio = ? WHERE id = ?";
     private static final String DELETE_PRODUCTO = "DELETE FROM productos WHERE id = ?";
 
+    //Consulta para eliminar detalles
+    private static final String DELETE_DETALLE_PRODUCTO = "DELETE FROM detalles WHERE producto_id = ?";
     //Variables
     Connection con = null;
     PreparedStatement ps = null;
@@ -113,10 +115,17 @@ public class ProductoDaoJdbc implements ProductoDaoInterface {
     public void delete(int id) {
         try {
             con = Conexion.getConnection();
+
+            // Eliminar los detalles asociados al producto
+            ps = con.prepareStatement(DELETE_DETALLE_PRODUCTO);
+            ps.setInt(1, id);
+            ps.executeUpdate();
+            Conexion.close(ps);
+
+            // Eliminar el producto
             ps = con.prepareStatement(DELETE_PRODUCTO);
             ps.setInt(1, id);
             ps.executeUpdate();
-
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -126,5 +135,4 @@ public class ProductoDaoJdbc implements ProductoDaoInterface {
             Conexion.close(con);
         }
     }
-
 }

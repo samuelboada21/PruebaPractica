@@ -118,7 +118,6 @@ public class FacturaServlet extends HttpServlet {
         List<Detalle> detalles = mapper.readerFor(new TypeReference<List<Detalle>>() {}).readValue(rootNode.get("detalles"));
         // Llamar al servicio para añadir la factura con sus detalles
         facturaService.añadirFactura(nuevaFactura, detalles);
-
         // Enviar respuesta al cliente
         enviarResponse(response, HttpServletResponse.SC_CREATED, "Se creó exitosamente la factura y sus detalles");
     }
@@ -156,7 +155,6 @@ public class FacturaServlet extends HttpServlet {
         //Se construye el objeto
         MessagesResponse messageResponse = new MessagesResponse(statusCode, mensaje);
         String jsonResponse = mapper.writeValueAsString(messageResponse);
-
         response.setContentType("application/json"); //se transforma a json
         response.setCharacterEncoding("UTF-8");
         response.setStatus(statusCode); // estado
